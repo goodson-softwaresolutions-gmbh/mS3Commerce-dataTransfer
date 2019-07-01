@@ -1,0 +1,7 @@
+<?php
+define('MS3COMMERCE_PRODUCTION_SUFFIX','s2');
+define('MS3COMMERCE_STAGE_SUFFIX','s1');
+
+define('MS3C_PRODUCTION_EXT_DIR', 's2');
+define('MS3C_STAGE_EXT_DIR', 's1');
+?>

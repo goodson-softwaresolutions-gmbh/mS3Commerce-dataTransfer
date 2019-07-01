@@ -1,0 +1,8 @@
+<ifModule mod_headers.c>
+	Header set Cache-Control "no-cache"
+	Header set Pragma "no-cache"
+</ifModule>
+
+<Files "*.db">
+	ForceType application/octet-stream
+</Files>

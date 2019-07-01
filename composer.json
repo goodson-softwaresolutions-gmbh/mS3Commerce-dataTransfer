@@ -1,0 +1,13 @@
+{
+    "name": "ms3commerce/dataTransfer",
+    "description": "mS3 Commerce dataTransfer",
+    "authors": [
+        {
+            "name": "Goodson GmbH",
+            "email": "support@goodson.at"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}

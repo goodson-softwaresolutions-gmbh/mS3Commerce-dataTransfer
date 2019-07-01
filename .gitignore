@@ -1,0 +1,9 @@
+/runtime_config.php
+/mS3CommerceStage.php
+/mS3CommerceDBAccess.php
+/diff/*.db
+/ext/*
+/log/*.txt
+/search/elasticsearch/es_phpapi/
+/uploads/*
+/mS3CommerceVersion.php
