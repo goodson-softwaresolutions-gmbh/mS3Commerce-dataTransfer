@@ -14,3 +14,4 @@
 ***************************************************************/
 
 define('MS3C_VERSION', '${Major}.${Minor}.${Patch}.${Build}');
+define('MS3C_VERSION_FULL', '${Major}.${Minor}.${Patch}.${Build}${-AdditionalText}${-CommitHash}');
