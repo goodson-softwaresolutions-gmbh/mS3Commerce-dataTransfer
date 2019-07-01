@@ -6,4 +6,3 @@
 /log/*.txt
 /search/elasticsearch/es_phpapi/
 /uploads/*
-/mS3CommerceVersion.php
