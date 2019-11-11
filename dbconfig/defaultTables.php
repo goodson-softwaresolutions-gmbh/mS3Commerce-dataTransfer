@@ -18,8 +18,6 @@ $GLOBALS['MS3C_TABLES'] = array (
 	'Feature',
 	'FeatureValue',
 	'Groups',
-	'GroupChildGroups',
-	'GroupChildProducts',
 	'GroupValue',
 	'Menu',
 	'Product',
