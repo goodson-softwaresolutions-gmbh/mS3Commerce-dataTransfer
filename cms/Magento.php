@@ -15,7 +15,7 @@
 
 define('MS3C_CMS_DB_FILE', MS3C_ROOT . '/dataTransfer/cms/magento/class.tx_ms3commerce_ms3magento_db.php');
 
-define('MS3C_MS3M_SEMAPHORE_DIR', MS3C_ROOT . '/import/mS3/');
+define('MS3C_MS3M_SEMAPHORE_DIR', MS3C_EXT_ROOT . '/import/mS3/');
 define('MS3C_MS3M_IMPORT_READY_FILE', MS3C_MS3M_SEMAPHORE_DIR.'import_ready');
 define('MS3C_MS3M_IMPORT_BUSY_FILE', MS3C_MS3M_SEMAPHORE_DIR.'import_busy');
 

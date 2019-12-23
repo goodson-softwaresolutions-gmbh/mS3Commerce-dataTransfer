@@ -15,7 +15,7 @@
 
 define('MS3C_CMS_DB_FILE', MS3C_ROOT . '/dataTransfer/cms/oxid/class.tx_ms3commerce_ms3oxid_db.php');
 
-define('MS3C_MS3O_SEMAPHORE_DIR', MS3C_ROOT . '/import/mS3/');
+define('MS3C_MS3O_SEMAPHORE_DIR', MS3C_EXT_ROOT . '/import/mS3/');
 define('MS3C_MS3O_IMPORT_READY_FILE', MS3C_MS3O_SEMAPHORE_DIR.'import_ready');
 define('MS3C_MS3O_IMPORT_BUSY_FILE', MS3C_MS3O_SEMAPHORE_DIR.'import_busy');
 
