@@ -13,5 +13,5 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-define('MS3C_VERSION', '6.2.9.19440');
-define('MS3C_VERSION_FULL', '6.2.9.19440');
+define('MS3C_VERSION', '6.2.11.19520');
+define('MS3C_VERSION_FULL', '6.2.11.19520');
