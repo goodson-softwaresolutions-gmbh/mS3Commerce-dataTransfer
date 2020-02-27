@@ -4,12 +4,15 @@ class mS3CommerceDbModifyUtils
 {
     /** @var tx_ms3commerce_db */
     var $db;
+    /** @var int */
+    var $shopId;
 
     /**
      * mS3CommerceDbModifyUtils constructor.
      * @param tx_ms3commerce_db $db
+     * @param int $shopId
      */
-    public function __construct($db)
+    public function __construct($db, $shopId)
     {
         $this->db = $db;
     }
@@ -66,6 +69,9 @@ class mS3CommerceDbModifyUtils
         }
         if (defined('RealURLMap_TABLE') && !empty(RealURLMap_TABLE)) {
             $this->db->sql_query("DELETE FROM ".RealURLMap_TABLE." WHERE asim_mapid IN (SELECT ContextId FROM Menu WHERE GroupId IN ($ids))", 'RealURLMap_TABLE, Menu');
+        }
+        if (defined('MS3C_SEARCH_BACKEND') && MS3C_SEARCH_BACKEND == 'MySQL') {
+            $this->db->sql_query("DELETE FROM FullText_{$this->shopId} WHERE ParentType = 1 AND ParentId IN ($ids)", 'FullText_'.$this->shopId);
         }
         $this->db->sql_query("DELETE FROM Relations WHERE GroupId IN ($ids)", 'Relations');
         $this->db->sql_query("DELETE FROM Relations WHERE DestinationType = 1 AND DestinationId IN ($ids)", 'Relations');
@@ -148,6 +154,9 @@ XXX;
         }
         if (defined('RealURLMap_TABLE') && !empty(RealURLMap_TABLE)) {
             $this->db->sql_query("DELETE FROM ".RealURLMap_TABLE." WHERE asim_mapid IN (SELECT ContextId FROM Menu WHERE ProductId IN ($ids))", 'RealURLMap_TABLE, Menu');
+        }
+        if (defined('MS3C_SEARCH_BACKEND') && MS3C_SEARCH_BACKEND == 'MySQL') {
+            $this->db->sql_query("DELETE FROM FullText_{$this->shopId} WHERE ParentType = 2 AND ParentId IN ($ids)", 'FullText_'.$this->shopId);
         }
         $this->db->sql_query("DELETE FROM Relations WHERE ProductId IN ($ids)", 'Relations');
         $this->db->sql_query("DELETE FROM Relations WHERE DestinationType = 2 AND DestinationId IN ($ids)", 'Relations');
