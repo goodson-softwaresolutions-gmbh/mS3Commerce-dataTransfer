@@ -90,29 +90,47 @@ class mS3CommerceDbModifyUtils
         $sql = <<<XXX
 INSERT INTO tmpDeleteGroups
 SELECT Id FROM (
-    SELECT t.GroupId AS Id
-    FROM Menu t
-    INNER JOIN Menu p ON t.Path LIKE CONCAT(p.Path,'/',p.Id,'%') AND p.GroupId IN (SELECT Id FROM tmpDeleteGroups)
-    WHERE t.GroupId IS NOT NULL 
-    GROUP BY t.GroupId
-    HAVING COUNT(t.GroupId) = COUNT(p.Id)
+    -- Find all occurences in to-be-deleted groups
+	SELECT m.GroupId AS Id FROM (
+	    SELECT t.GroupId, COUNT(t.GroupId) AS ct
+	    FROM Menu t
+	    INNER JOIN Menu p ON t.Path LIKE CONCAT(p.Path,'/',p.Id,'%') AND p.GroupId IN (SELECT Id FROM tmpDeleteGroups)
+	    WHERE t.GroupId IS NOT NULL 
+	    GROUP BY t.GroupId
+    ) td
+    
+    -- Find ALL usages
+    INNER JOIN Menu m ON m.GroupId = td.GroupId
+    GROUP BY m.GroupId
+    
+    -- Find those who are ONLY in to-be-deleted groups
+    HAVING MAX(ct) = COUNT(td.GroupId)
 ) t
 WHERE t.Id NOT IN (SELECT Id FROM tmpDeleteGroups)
 XXX;
-        $this->db->sql_query($sql, 'Menu t, Menu p');
+        $this->db->sql_query($sql, 'Menu t, Menu p, Menu m');
     }
 
     private function prepareExclusiveProductsInSubgroups() {
         // Gets products that are children of selected gorups, and no where else
         $sql = <<<XXX
-SELECT t.ProductId AS Id
-FROM Menu t
-INNER JOIN Menu p ON t.Path LIKE CONCAT(p.Path,'/',p.Id,'%') AND p.GroupId IN (SELECT Id FROM tmpDeleteGroups)
-WHERE t.ProductId IS NOT NULL 
-GROUP BY t.ProductId
-HAVING COUNT(t.ProductId) = COUNT(p.Id)
+    SELECT m.ProductId FROM (
+        -- Find all occurences in to-be-deleted groups
+        SELECT t.ProductId, COUNT(t.ProductId) AS ct
+        FROM Menu t
+        INNER JOIN Menu p ON t.ParentId = p.Id AND p.GroupId IN (SELECT Id FROM tmpDeleteGroups)
+        WHERE t.ProductId IS NOT NULL 
+        GROUP BY t.ProductId
+    ) td
+    
+    -- Find ALL usages
+    INNER JOIN Menu m ON m.ProductId = td.ProductId
+    GROUP BY m.ProductId
+    
+    -- Find those who are ONLY in to-be-deleted groups
+    HAVING MAX(ct) = COUNT(m.ProductId) 
 XXX;
-        $this->prepareDeleteProductsByStatement($sql, 'Menu t, Menu p');
+        $this->prepareDeleteProductsByStatement($sql, 'Menu t, Menu p, Menu m');
     }
 
     private $productIds = [];
