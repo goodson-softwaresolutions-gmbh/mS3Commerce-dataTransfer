@@ -25,6 +25,7 @@ define('MS3C_CMS_TYPE', 'None');	// Alternatives: None, Typo3, OXID, Magento, Sh
 
 /// For Typo3:
 define('MS3C_TYPO3_RELEASE', '7'); // Alternatives: 6, 7
+define('MS3C_TYPO3_TYPE', 'FX'); // Alternatives: FX, PI
 
 /// For OXID:
 define('MS3C_OXID_ONLY', false);	// Can be omitted if not OXID ONLY

@@ -13,11 +13,14 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-define('MS3C_CMS_DB_FILE', MS3C_EXT_ROOT . '/typo3conf/ext/ms3commerce/pi1/class.tx_ms3commerce_db.php');
-
-// Typo3 always needs a TYPO3_MODE set!
-if (!defined('TYPO3_MODE')) {
-	define('TYPO3_MODE', 'mS3Commerce');
+if (MS3C_TYPO3_TYPE == 'FX') {
+	define('MS3C_CMS_DB_FILE', MS3C_ROOT . '/dataTransfer/cms/typo3/class.tx_ms3commerce_typo3_db.php');
+} else {
+	define('MS3C_CMS_DB_FILE', MS3C_EXT_ROOT . '/typo3conf/ext/ms3commerce/pi1/class.tx_ms3commerce_db.php');
+	// Typo3 always needs a TYPO3_MODE set!
+	if (!defined('TYPO3_MODE')) {
+		define('TYPO3_MODE', 'mS3Commerce');
+	}
 }
 
 ?>
