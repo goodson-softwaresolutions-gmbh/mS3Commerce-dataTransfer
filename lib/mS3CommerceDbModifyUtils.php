@@ -42,6 +42,9 @@ class mS3CommerceDbModifyUtils
         if (!$this->stepDeleteProducts($stepSize)) {
             return false;
         }
+        if (!$this->stepDeleteMenusRecursive($stepSize)) {
+            return false;
+        }
 
         $res = $this->db->sql_query('SELECT Id FROM tmpDeleteGroups LIMIT '.$stepSize);
         $rows = $res->fetch_all();
@@ -57,8 +60,25 @@ class mS3CommerceDbModifyUtils
         return false;
     }
 
+    private function stepDeleteMenusRecursive($stepSize)
+    {
+        $res = $this->db->sql_query('SELECT Id FROM tmpDeleteMenus LIMIT '.$stepSize);
+        $rows = $res->fetch_all();
+
+        if (empty($rows)) {
+            return true;
+        }
+
+        $rows = array_map(function($r) { return $r[0]; }, $rows);
+        $ids = implode(',', $rows);
+        $this->db->sql_query("DELETE FROM Menu WHERE Id IN ($ids)", 'Menu');
+        $this->db->sql_query("DELETE FROM tmpDeleteMenus WHERE Id IN ($ids)");
+        return false;
+    }
+
     public function finishDeleteGroupsRecursive() {
         $this->db->sql_query('DROP TABLE IF EXISTS tmpDeleteGroups');
+        $this->db->sql_query('DROP TABLE IF EXISTS tmpDeleteMenus');
     }
 
     public function deleteGroups($ids) {
@@ -83,9 +103,20 @@ class mS3CommerceDbModifyUtils
     private function createDeleteGroupsRecursiveTable() {
         $this->db->sql_query('CREATE TABLE IF NOT EXISTS tmpDeleteGroups (Id INT NOT NULL PRIMARY KEY)');
         $this->db->sql_query('TRUNCATE TABLE tmpDeleteGroups');
+        $this->db->sql_query('CREATE TABLE IF NOT EXISTS tmpDeleteMenus (Id INT NOT NULL PRIMARY KEY)');
+        $this->db->sql_query('TRUNCATE TABLE tmpDeleteMenus');
     }
 
     private function addDeleteSubgroupsRecursive() {
+        // Mark menu paths for deletion
+        $sql = <<<XXX
+INSERT INTO tmpDeleteMenus
+SELECT DISTINCT t.Id
+FROM Menu t
+INNER JOIN Menu p ON t.Path LIKE CONCAT(p.Path,'/',p.Id,'%') AND p.GroupId IN (SELECT Id FROM tmpDeleteGroups)
+XXX;
+        $this->db->sql_query($sql, 'Menu t, Menu p');
+
         // Add all Groups that are children of selected gorups, and no where else
         $sql = <<<XXX
 INSERT INTO tmpDeleteGroups
