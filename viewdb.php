@@ -151,10 +151,11 @@ function printElement($menuId, $db) {
         SELECT f.Name AS FeatureName, v.ContentPlain AS FeatureValue
         FROM {$tablePrefix}Value v
         INNER JOIN Feature f ON f.Id = v.FeatureId
+        INNER JOIN StructureElement s ON s.Id = f.StructureElementId
         WHERE v.{$tablePrefix}Id = '$elemId'
-        ORDER BY f.Name";
+        ORDER BY s.OrderNr, f.Name";
 	
-	$res = $db->sql_query($SQL_Feature, array('Feature f',$tablePrefix.'Value v'));
+	$res = $db->sql_query($SQL_Feature, array('Feature f',$tablePrefix.'Value v','StructureElement s'));
 	
 	if ($res) {
         echo '<table border="0">
@@ -179,17 +180,19 @@ function printChildren($parentMenuId, $table, $prefix, $db, $useLinks, $isDoc = 
     } else {
         $add = "''";
     }
-    $SQL_Menu = 'SELECT m.Id, c.Name, c.AsimOid, m.ContextId, c.Id AS ChildId, ' . $add . ' AS Path
+    $SQL_Menu = 'SELECT m.Id, c.Name, c.AuxiliaryName, c.AsimOid, m.ContextId, c.Id AS ChildId, ' . $add . ' AS Path
 		FROM Menu m
 		INNER JOIN `' . $table . '` c
 			ON c.Id = m.' . $prefix . 'Id
 		WHERE m.ParentId ';
 
 
-    $SQL_Feature = 'SELECT DISTINCT f.`Name`
+    $SQL_Feature = 'SELECT DISTINCT f.`Name`, s.OrderNr
 		FROM Feature f
 		INNER JOIN ' . $prefix . 'Value cv
 			ON f.Id = cv.FeatureId
+		INNER JOIN StructureElement s
+		    ON f.StructureElementId = s.Id
 		INNER JOIN `' . $table . '` c
 			ON c.Id = cv.' . $prefix . 'Id
 		INNER JOIN Menu m
@@ -209,16 +212,19 @@ function printChildren($parentMenuId, $table, $prefix, $db, $useLinks, $isDoc = 
         $SQL_Menu .= "IS NULL";
         $SQL_Feature .= "IS NULL";
     }
+
+    $SQL_Feature .= " ORDER BY s.OrderNr, f.name";
+
     $SQL_Menu.=" ORDER BY m.Id";
 
     echo '<table border="0">
-	<tr class="firstline"><td>MenuId</td><td>' . $prefix . 'Id</td><td>asim OID</td><td>Name</td>
+	<tr class="firstline"><td>MenuId</td><td>' . $prefix . 'Id</td><td>asim OID</td><td>Name</td><td>Auxiliary Name</td>
 	';
     if ($isDoc)
         echo '<td>File</td>';
 
     # Get all Features that appear in all children => into array
-    $featrs = $db->sql_query($SQL_Feature, array('Feature f', $prefix . 'Value cv', "`$table` c", 'Menu m'));
+    $featrs = $db->sql_query($SQL_Feature, array('Feature f', $prefix . 'Value cv', "`$table` c", 'Menu m', 'StructureElement s'));
     $feats = array();
     while ($featrow = $db->sql_fetch_object($featrs)) {
         echo "<td>$featrow->Name</td>";
@@ -236,7 +242,7 @@ function printChildren($parentMenuId, $table, $prefix, $db, $useLinks, $isDoc = 
         } else {
             echo $mrow->Id;
         }
-        echo "</td><td>$mrow->ChildId</td><td>$mrow->ContextId</td><td>$mrow->Name</td>";
+        echo "</td><td>$mrow->ChildId</td><td>$mrow->ContextId</td><td>$mrow->Name</td><td>$mrow->AuxiliaryName</td>";
         if ($isDoc)
             echo "<td>$mrow->Path&nbsp;</td>";
 
