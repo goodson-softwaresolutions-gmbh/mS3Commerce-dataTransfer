@@ -56,7 +56,7 @@ class tx_ms3commerce_db_factory_cms
 
     static function connectToTypo3Database()
     {
-        $conf = require_once(MS3C_EXT_ROOT . '/typo3conf/LocalConfiguration.php');
+        $conf = require(MS3C_EXT_ROOT . '/typo3conf/LocalConfiguration.php');
         $db = $conf['DB']['Connections']['Default'];
         $dbAccess = array(
             'host' => $db['host'],
