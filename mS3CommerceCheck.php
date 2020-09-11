@@ -38,16 +38,16 @@ function startTest() {
 function testPHPVersion() {
 	outputHeadline("PHP Version");
 	$version = explode(".", phpversion());
-	if ($version[0] == 5 && $version[1] >= 2 && $version[1] <= 6) {
-		if ($version[1] >= 3 && $version[1] <= 6) {
-			outputMessage("Ihre PHP Version " . phpversion() . " ist korrekt!", 0);
-		} else {
-			outputMessage("Sie benutzen die PHP Version " . phpversion() . ". In ihrer Version kann es zu Fehlern kommen da mS3 Commerce für die Versionen 5.3 - 5.6 ausgelegt ist.", 1);
-		}
+	if ($version[0] == 5) {
+        outputMessage("Sie benutzen eine veraltete PHP Version " . phpversion() . ". In ihrer Version kann es zu Fehlern kommen da mS3 Commerce nicht für diese Version ausgelegt ist.", 1);
 	} else if ($version[0] == 7) {
-		outputMessage("Ihre PHP Version " . phpversion() . " ist korrekt!", 0);
+	    if ($version[1] <= 4) {
+            outputMessage("Ihre PHP Version " . phpversion() . " ist korrekt!", 0);
+        } else {
+            outputMessage("Sie benutzen eine veraltete PHP Version " . phpversion() . ". In ihrer Version kann es zu Fehlern kommen da mS3 Commerce nicht für diese Version ausgelegt ist.", 1);
+        }
 	} else {
-		outputMessage("Ihre PHP Version " . phpversion() . " wird nicht unterstützt. Sie sollten auf PHP 5.3 - 5.6 updaten!", 2);
+		outputMessage("Ihre PHP Version " . phpversion() . " wird nicht unterstützt. Sie sollten auf PHP 7.0 - 7.4 updaten!", 2);
 	}
 }
 
@@ -144,23 +144,46 @@ function testCMS() {
  * Testet die Typo3 spezifischen anforderungen
  */
 function testTypo3() {
-	if(file_exists(MS3C_EXT_ROOT."/typo3conf/ext/ms3commerce/pi1/class.tx_ms3commerce_db.php")){
-		outputMessage("Die mS3 Commerce Typo3 Erweiterung existiert!", 0);
-	}else{
-		outputMessage("Die mS3 Commerce Typo3 Erweiterung wurde nicht gefunden!", 2);
-	}
-	switch (MS3C_SHOP_SYSTEM) {
-		case 'None':
-			outputMessage("Typo3 verwendet keinen Shop!", 0);
-			break;
-		case 'tt_products':
-			outputMessage("Typo3 verwendet tt_products als Shop!", 0);
-			testTTProducts();
-			break;
-		default:
-			outputMessage("Die Variabel MS3C_SHOP_SYSTEM hat einen ungültigen Wert!", 2);
-			break;
-	}
+    if (MS3C_TYPO3_TYPE == 'FX') {
+        if(file_exists(MS3C_EXT_ROOT."/typo3conf/ext/ms3commercefx/ext_emconf.php")){
+            outputMessage("Die mS3 Commerce Typo3 FX Erweiterung existiert!", 0);
+        }else{
+            outputMessage("Die mS3 Commerce Typo3 FX Erweiterung wurde nicht gefunden!", 2);
+        }
+        switch (MS3C_SHOP_SYSTEM) {
+            case 'None':
+                outputMessage("Typo3 verwendet keinen Shop!", 0);
+                break;
+            case 'tx_cart':
+                outputMessage("Typo3 verwendet tx_cart als Shop!", 0);
+                testTXCarts();
+                break;
+
+            default:
+                outputMessage("Die Variabel MS3C_SHOP_SYSTEM hat einen ungültigen Wert!", 2);
+                break;
+        }
+    } else {
+        outputMessage("Sie verwenden die veraltete mS3 Commerce Extension. Funktionalität und Support kann nicht garantiert werden.", 1);
+        if(file_exists(MS3C_EXT_ROOT."/typo3conf/ext/ms3commerce/pi1/class.tx_ms3commerce_db.php")){
+            outputMessage("Die mS3 Commerce Typo3 Erweiterung existiert!", 0);
+        }else{
+            outputMessage("Die mS3 Commerce Typo3 Erweiterung wurde nicht gefunden!", 2);
+        }
+        switch (MS3C_SHOP_SYSTEM) {
+            case 'None':
+                outputMessage("Typo3 verwendet keinen Shop!", 0);
+                break;
+            case 'tt_products':
+                outputMessage("Typo3 verwendet tt_products als Shop!", 0);
+                testTTProducts();
+                break;
+
+            default:
+                outputMessage("Die Variabel MS3C_SHOP_SYSTEM hat einen ungültigen Wert!", 2);
+                break;
+        }
+    }
 }
 
 /**
@@ -168,6 +191,14 @@ function testTypo3() {
  */
 function testTTProducts() {
 	checkFileExists('shop/tt_products.php');
+}
+
+function testTXCarts() {
+    if (file_exists(MS3C_EXT_ROOT."/typo3conf/ext/cart/ext_emconf.php")) {
+        outputMessage("Die tx_cart Extension existiert!", 0);
+    } else {
+        outputMessage("Die tx_cart Extension wurde nicht gefunden!", 2);
+    }
 }
 
 /**
