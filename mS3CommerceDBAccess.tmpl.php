@@ -22,5 +22,3 @@ function MS3C_DB_ACCESS() {
 		)
 	);
 }
-
-?>

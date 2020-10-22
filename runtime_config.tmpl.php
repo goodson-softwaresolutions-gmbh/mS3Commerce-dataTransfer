@@ -70,5 +70,3 @@ define('MS3C_LOG_EMAIL_SENDER', 'importMaster@goodson.at');
 define('MS3C_TASK_MAIL_RECEIVER','');
 define('MS3C_TASK_NOTIFY_ON_SUCCESS', false);
 define('MS3C_PHP_BINARY', 'php5');
-
-?>
