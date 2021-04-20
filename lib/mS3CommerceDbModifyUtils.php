@@ -123,16 +123,16 @@ INSERT INTO tmpDeleteGroups
 SELECT Id FROM (
     -- Find all occurences in to-be-deleted groups
 	SELECT m.GroupId AS Id FROM (
-	    SELECT t.GroupId, COUNT(t.GroupId) AS ct
+	    SELECT t.GroupId, t.Path, COUNT(t.GroupId) AS ct
 	    FROM Menu t
 	    INNER JOIN Menu p ON t.Path LIKE CONCAT(p.Path,'/',p.Id,'%') AND p.GroupId IN (SELECT Id FROM tmpDeleteGroups)
 	    WHERE t.GroupId IS NOT NULL 
-	    GROUP BY t.GroupId
+	    GROUP BY t.GroupId, td.Path
     ) td
     
     -- Find ALL usages
-    INNER JOIN Menu m ON m.GroupId = td.GroupId
-    GROUP BY m.GroupId
+    INNER JOIN Menu m ON m.GroupId = td.GroupId AND m.Path = td.Path
+    GROUP BY m.GroupId, td.Path
     
     -- Find those who are ONLY in to-be-deleted groups
     HAVING MAX(ct) = COUNT(td.GroupId)
