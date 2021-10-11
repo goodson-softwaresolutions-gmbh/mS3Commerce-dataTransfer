@@ -196,15 +196,15 @@ function sweepSameDb($table, $where, $allShops)
 	$dbStage = tx_ms3commerce_db_factory::buildDatabase(false, true);
 	
 	if (strlen($where) == 0) {
-		$sqlDel = "TRUNCATE TABLE $table";
+		$sqlDel = "TRUNCATE TABLE `$table`";
 	} else {
-		$sqlDel = "DELETE FROM $table $where";
+		$sqlDel = "DELETE FROM `$table` $where";
 	}
 	
 	if (defined('RealURLMap_TABLE') && $table == RealURLMap_TABLE) {
 		// Special case: If RealURLMap Table has an auto-increment (Primary) Key,
 		// don't include it in field list!
-		$sqlMeta = "SHOW COLUMNS FROM $table";
+		$sqlMeta = "SHOW COLUMNS FROM `$table`";
 		$rs = $dbStage->sql_query($sqlMeta);
 		if (!$rs) {
 			return "Cannot get Meta Data from table $table: {$dbStage->sql_error()}";
@@ -222,7 +222,7 @@ function sweepSameDb($table, $where, $allShops)
 		$fields = "*";
 	}
 	
-	$sqlIns = "INSERT INTO $dbStageName.$table SELECT $fields FROM $dbProdName.$table $where";
+	$sqlIns = "INSERT INTO $dbStageName.`$table` SELECT $fields FROM $dbProdName.`$table` $where";
 	
 	$dbStage->sql_query("/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;");
 	$dbStage->sql_query("/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */");
@@ -293,9 +293,9 @@ function sweepAcrossDBs(tx_ms3commerce_db $source, tx_ms3commerce_db $dest, $src
 	
 	// DELETE
 	if (strlen($where) == 0) {
-		$sqlDel = "TRUNCATE TABLE $destTable";
+		$sqlDel = "TRUNCATE TABLE `$destTable`";
 	} else {
-		$sqlDel = "DELETE FROM $destTable $where";
+		$sqlDel = "DELETE FROM `$destTable` $where";
 	}
 	if ( $off == 0 ) {
 		if ( !$dest->sql_query($sqlDel) )
@@ -305,7 +305,7 @@ function sweepAcrossDBs(tx_ms3commerce_db $source, tx_ms3commerce_db $dest, $src
 	}
 	
 	// TOTAL
-	$sqlTotal = "SELECT COUNT(*) FROM $srcTable $where";
+	$sqlTotal = "SELECT COUNT(*) FROM `$srcTable` $where";
 	$rs = $source->sql_query($sqlTotal);
 	if (!$rs) {
 		return "Cannot get total from table $srcTable: {$source->sql_error()}";
@@ -316,7 +316,7 @@ function sweepAcrossDBs(tx_ms3commerce_db $source, tx_ms3commerce_db $dest, $src
 	$source->sql_free_result($rs);
 	
 	// META
-	$sqlMeta = "SHOW COLUMNS FROM $srcTable";
+	$sqlMeta = "SHOW COLUMNS FROM `$srcTable`";
 	$rs = $source->sql_query($sqlMeta);
 	if (!$rs) {
 		return "Cannot get Meta Data from table $srcTable: {$source->sql_error()}";
@@ -347,7 +347,7 @@ function sweepAcrossDBs(tx_ms3commerce_db $source, tx_ms3commerce_db $dest, $src
 	if ($fields != "*") {
 		$fields = implode(',', $fields);
 	}
-	$sqlSel = "SELECT $fields FROM $srcTable $where ORDER BY $order LIMIT $off,$count";
+	$sqlSel = "SELECT $fields FROM `$srcTable` $where ORDER BY $order LIMIT $off,$count";
 	$rs = $source->sql_query($sqlSel);
 	if (!$rs) {
 		return responseMsg('error', "Cannot get total from table $srcTable: {$source->sql_error()}");
@@ -379,7 +379,7 @@ function sweepAcrossDBs(tx_ms3commerce_db $source, tx_ms3commerce_db $dest, $src
 		$INSERT = "INSERT";
 	}
 	$bulk = substr($bulk, 0, -1);
-	$bulk = "$INSERT INTO $destTable (".implode(',', $cols).") VALUES " . $bulk;
+	$bulk = "$INSERT INTO `$destTable` (".implode(',', $cols).") VALUES " . $bulk;
 	unset($row);
 	$source->sql_free_result($rs);
 	

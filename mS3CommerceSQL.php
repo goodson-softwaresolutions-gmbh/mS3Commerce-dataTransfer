@@ -156,7 +156,7 @@ function reqOptimizeTable($args)
 			return responseMsg('error', 'Error in optimize: Cannot connect to database');
 		}
 	}
-	$res = $db->sql_query("OPTIMIZE TABLE $table", $table);
+	$res = $db->sql_query("OPTIMIZE TABLE `$table`", $table);
 	
 	$err = null;
 	while ($row = $db->sql_fetch_assoc($res)) {

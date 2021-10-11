@@ -97,7 +97,7 @@ class mS3CommerceDbModifyUtils
         $this->db->sql_query("DELETE FROM Relations WHERE DestinationType = 1 AND DestinationId IN ($ids)", 'Relations');
         $this->db->sql_query("DELETE FROM GroupValue WHERE GroupId IN ($ids)", 'GroupValue');
         $this->db->sql_query("DELETE FROM Menu WHERE GroupId IN ($ids)", 'Menu');
-        $this->db->sql_query("DELETE FROM Groups WHERE Id IN ($ids)", 'Groups');
+        $this->db->sql_query("DELETE FROM `Groups` WHERE Id IN ($ids)", '`Groups`');
     }
 
     private function createDeleteGroupsRecursiveTable() {

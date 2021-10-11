@@ -138,7 +138,7 @@ function printElement($menuId, $db) {
 			return;
 	}
 	
-	$SQL_Name = "SELECT Name, AuxiliaryName FROM $table WHERE Id = $elemId";
+	$SQL_Name = "SELECT Name, AuxiliaryName FROM `$table` WHERE Id = $elemId";
 	$res = $db->sql_query($SQL_Name, $table);
 	$row = $db->sql_fetch_assoc($res);
 	$db->sql_free_result($res);
@@ -343,7 +343,7 @@ function findMenuId(&$menuId, $groupId, $productId, $documentId, $contextId) {
           $SQL_FindMenu = '
           SELECT m.ParentId AS mId
           FROM Menu m
-          LEFT JOIN Groups g ON g.Id = m.GroupId AND g.AsimOid = "'.$asimId.'"
+          LEFT JOIN `Groups` g ON g.Id = m.GroupId AND g.AsimOid = "'.$asimId.'"
           LEFT JOIN Product p ON p.Id = m.ProductId AND p.AsimOid = "'.$asimId.'"
           LEFT JOIN Document d ON d.Id = m.DocumentId AND d.AsimOid = "'.$asimId.'"
           ';
