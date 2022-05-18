@@ -23,4 +23,20 @@ if (MS3C_TYPO3_TYPE == 'FX') {
 	}
 }
 
+function mS3CMSSwitchDBPostprocess($prodDBId, $arg)
+{
+	if (MS3C_TYPO3_TYPE == 'FX') {
+		if (defined('MS3C_TYPO3_CACHED') && MS3C_TYPO3_CACHED) {
+			$classLoader = @include(MS3C_ROOT . '/../autoload.php');
+			if (class_exists('\Ms3\Ms3CommerceFx\Service\CacheUtils')
+			&& method_exists('\Ms3\Ms3CommerceFx\Service\CacheUtils', 'cleanT3CacheExternal')
+			) {
+				\Ms3\Ms3CommerceFx\Service\CacheUtils::cleanT3CacheExternal($classLoader);
+			}
+		}
+	}
+
+	return [true, false, ''];
+}
+
 ?>

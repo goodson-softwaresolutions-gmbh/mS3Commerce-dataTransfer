@@ -24,8 +24,9 @@ define('MS3C_DB_USE_NEW_LINK', false);
 define('MS3C_CMS_TYPE', 'None');	// Alternatives: None, Typo3, OXID, Magento, Shopware
 
 /// For Typo3:
-define('MS3C_TYPO3_RELEASE', '7'); // Alternatives: 6, 7
+define('MS3C_TYPO3_RELEASE', '10'); // Alternatives: 9-10
 define('MS3C_TYPO3_TYPE', 'FX'); // Alternatives: FX, PI
+define('MS3C_TYPO3_CACHED', 1); // boolean
 
 /// For OXID:
 define('MS3C_OXID_ONLY', false);	// Can be omitted if not OXID ONLY
@@ -69,4 +70,4 @@ define('MS3C_LOG_EMAIL_SENDER', 'importMaster@goodson.at');
 // For Scheduler tasks
 define('MS3C_TASK_MAIL_RECEIVER','');
 define('MS3C_TASK_NOTIFY_ON_SUCCESS', false);
-define('MS3C_PHP_BINARY', 'php5');
+define('MS3C_PHP_BINARY', 'php');
