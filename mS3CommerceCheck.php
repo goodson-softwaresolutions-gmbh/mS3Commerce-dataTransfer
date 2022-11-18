@@ -38,16 +38,12 @@ function startTest() {
 function testPHPVersion() {
 	outputHeadline("PHP Version");
 	$version = explode(".", phpversion());
-	if ($version[0] == 5) {
-        outputMessage("Sie benutzen eine veraltete PHP Version " . phpversion() . ". In ihrer Version kann es zu Fehlern kommen da mS3 Commerce nicht für diese Version ausgelegt ist.", 1);
-	} else if ($version[0] == 7) {
-	    if ($version[1] <= 4) {
-            outputMessage("Ihre PHP Version " . phpversion() . " ist korrekt!", 0);
-        } else {
-            outputMessage("Sie benutzen eine veraltete PHP Version " . phpversion() . ". In ihrer Version kann es zu Fehlern kommen da mS3 Commerce nicht für diese Version ausgelegt ist.", 1);
-        }
-	} else {
-		outputMessage("Ihre PHP Version " . phpversion() . " wird nicht unterstützt. Sie sollten auf PHP 7.0 - 7.4 updaten!", 2);
+	if ($version[0] == 7) {
+        outputMessage("Ihre PHP Version " . phpversion() . " ist korrekt!", 0);
+	} else if ($version[0] == 8) {
+        outputMessage("Ihre PHP Version " . phpversion() . " ist korrekt!", 0);
+    } else {
+		outputMessage("Ihre PHP Version " . phpversion() . " wird nicht unterstützt.", 2);
 	}
 }
 
