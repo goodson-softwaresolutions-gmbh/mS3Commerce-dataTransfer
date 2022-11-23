@@ -53,6 +53,7 @@ class mS3CommerceDbBulkInserter
     }
 
     private function commit() {
+        if (empty($this->values)) return;
         $sql = "INSERT INTO {$this->table}";
         if ($this->colums) {
             $sql .= ' (' . implode(',', $this->colums) . ')';
