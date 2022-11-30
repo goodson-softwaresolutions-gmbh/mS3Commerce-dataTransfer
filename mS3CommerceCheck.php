@@ -130,6 +130,9 @@ function testCMS() {
 		case 'Shopware':
 			outputMessage("Sie verwenden Shopware!", 0);
 			break;
+        case 'Woo':
+            outputMessage("Sie verwenden WooCommerce!", 0);
+            break;
 		default:
 			outputMessage("Die Variabel MS3C_CMS_TYPE hat einen ungültigen Wert!", 2);
 			break;
@@ -211,17 +214,6 @@ function testDB() {
 				outputMessage("Das MYSQLI Modul ist nicht installiert!", 2);
 			}
 			testDBConnection($dbs, 0);
-			break;
-		case 'mysql':
-			if (function_exists('mysql_connect')) {
-				outputMessage("Das MYSQL Modul ist installiert!", 0);
-			} else {
-				outputMessage("Das MYSQL Modul ist nicht installiert!", 2);
-			}
-			if (function_exists('mysqli_connect')) {
-				outputMessage("Sie sollten MS3C_DB_BACKEND auf mysqli ändern!", 1);
-			}
-			testDBConnection($dbs, 1);
 			break;
 		default:
 			outputMessage("Die Variabel MS3C_DB_BACKEND hat einen ungültigen Wert!", 2);
@@ -338,27 +330,6 @@ function mysqliQuery($sql, $dbc) {
 }
 
 /**
- * MySQL Query über MYSQL
- * @param type $sql
- * @param type $dbc
- * @return type
- */
-function mysqlQuery($sql, $dbc) {
-	$ret = array();
-	if ($handler = @mysql_connect($dbc['host'], $dbc['username'], $dbc['password'])) {
-		if (@mysql_select_db($dbc['database'], $handler)) {
-			$result = mysql_query($sql, $handler);
-			if (mysql_num_rows($result) > 0) {
-				while ($row = mysql_fetch_assoc($result)) {
-					$ret[] = $row;
-				}
-			}
-		}
-	}
-	return $ret;
-}
-
-/**
  * Überprüft die Schreibrechte auf bestimmten Ordner und Dateien
  */
 function testFolder() {
@@ -405,7 +376,7 @@ function testDBTables() {
 		outputMessage("MS3C_ALLOWCREATE_SQL steht auf 0!", 0);
 	}
 	$tables = $GLOBALS['MS3C_TABLES'];
-	if (isOXIDOnly() || isMagentoOnly() || isShopwareOnly()) {
+	if (isOXIDOnly() || isMagentoOnly() || isShopwareOnly() || isWooOnly()) {
 		$tables = array();
 	}
 	if(MS3COMMERCE_STAGETYPE == "TABLES"){
@@ -462,6 +433,10 @@ function isMagentoOnly() {
 
 function isShopwareOnly() {
 	return MS3C_CMS_TYPE == "Shopware" && defined('MS3C_SHOPWARE_ONLY') && MS3C_SHOPWARE_ONLY;
+}
+
+function isWooOnly() {
+    return MS3C_CMS_TYPE == "Woo" && defined('MS3C_WOO_ONLY') && MS3C_WOO_ONLY;
 }
 
 function getDBConnections() {
