@@ -24,7 +24,7 @@ define('MS3C_DB_USE_NEW_LINK', false);
 define('MS3C_CMS_TYPE', 'None');	// Alternatives: None, Typo3, OXID, Magento, Shopware, Woo
 
 /// For Typo3:
-define('MS3C_TYPO3_RELEASE', '10'); // Alternatives: 9-10
+define('MS3C_TYPO3_RELEASE', '11'); // Alternatives: 9-11
 define('MS3C_TYPO3_TYPE', 'FX'); // Alternatives: FX, PI
 define('MS3C_TYPO3_CACHED', 1); // boolean
 
