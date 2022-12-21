@@ -127,7 +127,7 @@ SELECT Id FROM (
 	    FROM Menu t
 	    INNER JOIN Menu p ON t.Path LIKE CONCAT(p.Path,'/',p.Id,'%') AND p.GroupId IN (SELECT Id FROM tmpDeleteGroups)
 	    WHERE t.GroupId IS NOT NULL 
-	    GROUP BY t.GroupId, td.Path
+	    GROUP BY t.GroupId, t.Path
     ) td
     
     -- Find ALL usages
