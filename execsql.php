@@ -92,7 +92,7 @@ function exec_sql( $query, $tablemap, $useStage )
 	$row = "";
 	foreach ($o as $k => $v)
 	{
-		if (strlen($v) == 0) $v = "&nbsp;";
+		if (empty($v)) $v = "&nbsp;";
 		echo "<td>$k</td>";
 		$row .= "<td>$v</td>";
 	}
@@ -102,7 +102,7 @@ function exec_sql( $query, $tablemap, $useStage )
 		echo "<tr>";
 		foreach ($o as $v)
 		{
-			if (strlen($v) == 0) $v = "&nbsp;";
+			if (empty($v)) $v = "&nbsp;";
 			echo "<td>$v</td>";
 		}
 		echo "</tr>";
