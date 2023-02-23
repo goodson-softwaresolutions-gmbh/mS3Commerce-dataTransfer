@@ -15,6 +15,7 @@ class mS3CommerceDbModifyUtils
     public function __construct($db, $shopId)
     {
         $this->db = $db;
+		$this->shopId = $shopId;
     }
 
     public function prepareDeleteGroupsRecursiveByStatement($stmt, $tables = null) {
