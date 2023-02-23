@@ -120,7 +120,7 @@ XXX;
         // Add all Groups that are children of selected gorups, and no where else
         $sql = <<<XXX
 INSERT INTO tmpDeleteGroups
-SELECT Id FROM (
+SELECT DISTINCT Id FROM (
     -- Find all occurences in to-be-deleted groups
 	SELECT m.GroupId AS Id FROM (
 	    SELECT t.GroupId, t.Path, COUNT(t.GroupId) AS ct
