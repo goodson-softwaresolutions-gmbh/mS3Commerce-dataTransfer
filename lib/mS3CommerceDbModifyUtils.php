@@ -82,6 +82,23 @@ class mS3CommerceDbModifyUtils
         $this->db->sql_query('DROP TABLE IF EXISTS tmpDeleteMenus');
     }
 
+    public function cleaupOrphanedMenus() {
+        $shopCond = '';
+        if ($this->shopId) {
+            $rs = $this->db->sql_query("SELECT * FROM ShopInfo WHERE ShopId = {$this->shopId}");
+            if ($shopRow = $this->db->sql_fetch_assoc($rs)) {
+                $shopCond = "WHERE Id >= {$shopRow['StartId']} AND Id < {$shopRow['EndId']}";
+            }
+            $this->db->sql_free_result($rs);
+        }
+
+        $sql = "DELETE FROM Menu WHERE ParentId IS NOT NULL AND ParentId NOT IN (SELECT * FROM (SELECT Id FROM Menu $shopCond) x)";
+        do {
+            $res = $this->db->sql_query($sql);
+            $ct = $this->db->sql_affected_rows();
+        } while ($ct > 0);
+    }
+
     public function deleteGroups($ids) {
         $ids = implode(',', $ids);
         $this->db->sql_query("DELETE FROM DocumentLink WHERE GroupValueId IN (SELECT Id FROM GroupValue WHERE GroupId IN ($ids))", 'DocumentLink, GroupValue');
