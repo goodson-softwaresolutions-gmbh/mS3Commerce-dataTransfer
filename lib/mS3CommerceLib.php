@@ -261,6 +261,9 @@ function hasCommerceDatabase()
 	if (defined('MS3C_SHOPWARE_ONLY') && MS3C_SHOPWARE_ONLY) {
 		return false;
 	}
+    if (defined('MS3C_WOO_ONLY') && MS3C_WOO_ONLY) {
+        return false;
+    }
 	return true;
 }
 
