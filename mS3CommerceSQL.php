@@ -235,6 +235,13 @@ function connectToMS3ShopwareDB() {
 	return tx_ms3commerce_db_factory_cms::connectToMS3ShopwareDatabase();
 }
 
+function connectToMS3WooDB() {
+	if (MS3C_CMS_TYPE != 'Woo') {
+		die('This is not a mS3 WooCommerce installation');
+	}
+	return tx_ms3commerce_db_factory_cms::connectToMS3WooDatabase();
+}
+
 function connectDbByRequestModule()
 {
 	$module = getParameter('ms3module');
@@ -244,6 +251,8 @@ function connectDbByRequestModule()
 		$dblink = connectToMS3MagentoDB();
 	} else if ($module == 'shopware') {
 		$dblink = connectToMS3ShopwareDB();
+	} else if ($module == 'woo') {
+		$dblink = connectToMS3WooDB();
 	} else if ($module == '') {
 		$dblink = connectToMS3CommerceDB();
 	}
