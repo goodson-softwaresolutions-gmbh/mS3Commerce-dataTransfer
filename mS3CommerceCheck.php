@@ -121,14 +121,8 @@ function testCMS() {
 			outputMessage("Sie verwenden Typo3!", 0);
 			testTypo3();
 			break;
-		case 'OXID':
-			outputMessage("Sie verwenden OXID!", 0);
-			break;
 		case 'Magento':
 			outputMessage("Sie verwenden Magento!", 0);
-			break;
-		case 'Shopware':
-			outputMessage("Sie verwenden Shopware!", 0);
 			break;
         case 'Woo':
             outputMessage("Sie verwenden WooCommerce!", 0);
@@ -376,7 +370,7 @@ function testDBTables() {
 		outputMessage("MS3C_ALLOWCREATE_SQL steht auf 0!", 0);
 	}
 	$tables = $GLOBALS['MS3C_TABLES'];
-	if (isOXIDOnly() || isMagentoOnly() || isShopwareOnly() || isWooOnly()) {
+	if (isMagentoOnly() || isWooOnly()) {
 		$tables = array();
 	}
 	if(MS3COMMERCE_STAGETYPE == "TABLES"){
@@ -423,16 +417,8 @@ function testDBTables() {
 	
 }
 
-function isOXIDOnly() {
-	return MS3C_CMS_TYPE == "OXID" && defined('MS3C_OXID_ONLY') && MS3C_OXID_ONLY;
-}
-
 function isMagentoOnly() {
 	return MS3C_CMS_TYPE == "Magento" && defined('MS3C_MAGENTO_ONLY') && MS3C_MAGENTO_ONLY;
-}
-
-function isShopwareOnly() {
-	return MS3C_CMS_TYPE == "Shopware" && defined('MS3C_SHOPWARE_ONLY') && MS3C_SHOPWARE_ONLY;
 }
 
 function isWooOnly() {
@@ -441,7 +427,7 @@ function isWooOnly() {
 
 function getDBConnections() {
 	$dbs = MS3C_DB_ACCESS();
-	if (isOXIDOnly() || isMagentoOnly()) {
+	if (isWooOnly() || isMagentoOnly()) {
 		unset($dbs['tables']);
 		unset($dbs['stagedb1']);
 		unset($dbs['stagedb2']);

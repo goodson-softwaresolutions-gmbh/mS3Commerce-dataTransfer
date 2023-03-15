@@ -74,7 +74,7 @@ function mS3CoreUploadPostprocess($param, $arg)
 {
 	$shop = $param;
 	// Update ShopInfo to set Import Date
-	// ShopInfo only available if not in OXID/Magento Only mode
+	// ShopInfo only available if not in Magento/Woo Only mode
 	if (hasCommerceDatabase()) {
 		$db = connectToMS3CommerceDB();
 		date_default_timezone_set('Europe/Vienna');
@@ -149,7 +149,7 @@ function reqOptimizeTable($args)
 	set_time_limit(0);
 	$db = tx_ms3commerce_db_factory::buildDatabase(false, $useStage);
 	if ($db == null) {
-		// Special case if there is OXID/Magento Only: no normal database is valid
+		// Special case if there is Magento/Woo Only: no normal database is valid
 		if (!hasCommerceDatabase()) {
 			return responseMsg('success', 'Optimize finished (no commerce databases present)');
 		} else {
@@ -214,25 +214,11 @@ function connectToMS3CommerceDB() {
 	return tx_ms3commerce_db_factory::buildDatabase(false, true);
 }
 
-function connectToMS3OxidDB() {
-	if (MS3C_CMS_TYPE != 'OXID') {
-		die('This is not a mS3Oxid installation');
-	}
-	return tx_ms3commerce_db_factory_cms::connectToMS3OxidDatabase();
-}
-
 function connectToMS3MagentoDB() {
 	if (MS3C_CMS_TYPE != 'Magento') {
 		die('This is not a mS3 Magento installation');
 	}
 	return tx_ms3commerce_db_factory_cms::connectToMS3MagentoDatabase();
-}
-
-function connectToMS3ShopwareDB() {
-	if (MS3C_CMS_TYPE != 'Shopware') {
-		die('This is not a mS3 Shopware installation');
-	}
-	return tx_ms3commerce_db_factory_cms::connectToMS3ShopwareDatabase();
 }
 
 function connectToMS3WooDB() {
@@ -245,12 +231,8 @@ function connectToMS3WooDB() {
 function connectDbByRequestModule()
 {
 	$module = getParameter('ms3module');
-	if ($module == 'oxid') {
-		$dblink = connectToMS3OxidDB();
-	} else if ($module == 'magento') {
+	if ($module == 'magento') {
 		$dblink = connectToMS3MagentoDB();
-	} else if ($module == 'shopware') {
-		$dblink = connectToMS3ShopwareDB();
 	} else if ($module == 'woo') {
 		$dblink = connectToMS3WooDB();
 	} else if ($module == '') {

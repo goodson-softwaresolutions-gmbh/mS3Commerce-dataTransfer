@@ -21,21 +21,15 @@ define('MS3C_DB_USE_NEW_LINK', false);
 
 // Extensions / Plugins
 // CMS:
-define('MS3C_CMS_TYPE', 'None');	// Alternatives: None, Typo3, OXID, Magento, Shopware, Woo
+define('MS3C_CMS_TYPE', 'None');	// Alternatives: None, Typo3, Magento, Woo
 
 /// For Typo3:
 define('MS3C_TYPO3_RELEASE', '11'); // Alternatives: 9-11
 define('MS3C_TYPO3_TYPE', 'FX'); // Alternatives: FX, PI
 define('MS3C_TYPO3_CACHED', 1); // boolean
 
-/// For OXID:
-define('MS3C_OXID_ONLY', false);	// Can be omitted if not OXID ONLY
-
 /// For Magento:
 define('MS3C_MAGENTO_ONLY', false);	// Can be omitted
-
-/// For Shopware:
-define('MS3C_SHOPWARE_ONLY', false);	// Can be omitted
 
 /// For WooCommerce:
 define('MS3C_WOO_ONLY', false);	// Can be omitted
