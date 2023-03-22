@@ -23,7 +23,8 @@ $groupId = -1;
 $productId = -1;
 $documentId = -1;
 $contextId = -1;
-$asimId = -1;
+$searchTerm = "";
+
 $useStage = false;
 
 $dialog = "";
@@ -58,14 +59,14 @@ if ($_POST) {
         $contextId = $_POST['ContextId'];
     }
 
-    if (array_key_exists('asimOID', $_POST) && isset($_POST['asimOID'])) {
-        $asimId = $_POST['asimOID'];
+    if (array_key_exists('search', $_POST) && isset($_POST['search'])) {
+        $searchTerm = $_POST['search'];
     }
 }
 
 $db = tx_ms3commerce_db_factory::buildDatabase(false, $useStage);
 
-findMenuId($menuId, $groupId, $productId, $documentId, $contextId);
+findMenuId($menuId, $groupId, $productId, $documentId, $contextId, $searchTerm);
 
 function printShopInfo($db) {
     $ret = '<div class="tableArea"><div class="tableHeader">Shop Status:</div><div class="tableContent">';
@@ -314,43 +315,100 @@ function printSMZs($menuId, $db, $useStage) {
     echo '</div></div>';
 }
 
+function printRelations($menuId, $db, $useStage) {
+    $sql = "SELECT r.*, COALESCE(dg.Name, dp.Name, dd.Name) As DestName, COALESCE(dg.AuxiliaryName, dp.AuxiliaryName, dd.AuxiliaryName) As DestAuxiliaryName
+FROM Relations r
+INNER JOIN Menu m ON r.GroupId = m.GroupId OR r.ProductId = m.ProductId OR r.DocumentId = m.DocumentId
+LEFT JOIN `Groups` dg ON dg.Id = r.DestinationId AND r.DestinationType = 1
+LEFT JOIN Product dp ON dp.Id = r.DestinationId AND r.DestinationType = 2
+LEFT JOIN Document dd ON dd.Id = r.DestinationId AND r.DestinationType = 3
+WHERE m.Id = $menuId AND r.IsMother = 1
+ORDER BY r.OrderNr, r.Name, r.DestinationId";
+
+    echo '<div class="tableArea"><a name="relations"></a><div class="tableHeader">Relations:</div><div class="tableContent">';
+
+    echo "<table border='0'><tr class=\"firstline\"><td>Id</td><td>Type</td><td>Dir</td><td>Target</td><td>Text1</td><td>Text2</td><td>Amount</td></tr>";
+    $rs = $db->sql_query($sql, array('featureCompilation smz', 'FeatureCompValue s'));
+
+    if ($rs) {
+        while ($row = $db->sql_fetch_object($rs)) {
+            switch ($row->DestinationType) {
+                case 1: $link = "byGroupId({$row->DestinationId});"; break;
+                case 2: $link = "byProductId({$row->DestinationId});"; break;
+                case 3: $link = "byDocumentId({$row->DestinationId});"; break;
+            }
+
+            echo "<tr class=\"line\">
+                    <td>{$row->Id}</td>
+                    <td>{$row->Name}</td>
+                    <td>".($row->IsMother ?'TO':'FROM')."</td>
+                    <td><a href=\"javascript:$link\">{$row->DestName} {$row->DestAuxiliaryName}</a></td>
+                    <td>{$row->Text1}</td>
+                    <td>{$row->Text2}</td>
+                    <td>{$row->Amount}</td>
+                </tr>";
+        }
+
+        $db->sql_free_result($rs);
+    }
+    echo "</table>";
+    echo '</div></div>';
+}
+
 ## Find MenuId for Group/Product Id
 
-function findMenuId(&$menuId, $groupId, $productId, $documentId, $contextId) {
+function findMenuId(&$menuId, $groupId, $productId, $documentId, $contextId, $searchTerm) {
+    global $db;
+    $tables = 'Menu';
     if ($menuId <= 0) {
         $SQL_FindMenu = false;
         if ($groupId > 0) {
             $SQL_FindMenu = '
-		SELECT ParentId AS mId
+		SELECT ParentId AS mId, Id
 		FROM Menu
 		WHERE GroupId = ' . $groupId;
         } else if ($productId > 0) {
             $SQL_FindMenu = '
-		SELECT ParentId AS mId
+		SELECT ParentId AS mId, Id
 		FROM Menu
 		WHERE ProductId = ' . $productId;
         } else if ($documentId > 0) {
             $SQL_FindMenu = '
-		SELECT ParentId AS mId
+		SELECT ParentId AS mId, Id
 		FROM Menu
 		WHERE DocumentId = ' . $documentId;
         } else if ($contextId != '' && $contextId != -1) {
             $SQL_FindMenu = '
-		SELECT ParentId AS mId
+		SELECT ParentId AS mId, Id
 		FROM Menu
 		WHERE ContextId = "' . $contextId . '"';
-        } /* else if ( $asimId > 0 ) {
-          $SQL_FindMenu = '
-          SELECT m.ParentId AS mId
+        } else if ( strlen((trim($searchTerm))) > 0 ) {
+            $term = $db->sql_escape("%$searchTerm%");
+          $SQL_FindMenu = "
+          SELECT m.ParentId AS mId, m.Id
           FROM Menu m
-          LEFT JOIN `Groups` g ON g.Id = m.GroupId AND g.AsimOid = "'.$asimId.'"
-          LEFT JOIN Product p ON p.Id = m.ProductId AND p.AsimOid = "'.$asimId.'"
-          LEFT JOIN Document d ON d.Id = m.DocumentId AND d.AsimOid = "'.$asimId.'"
-          ';
-          } */
-        global $db;
+          LEFT JOIN `Groups` g ON g.Id = m.GroupId AND (g.Name LIKE $term OR g.AuxiliaryName LIKE $term)
+          LEFT JOIN Product p ON p.Id = m.ProductId AND (p.Name LIKE $term OR p.AuxiliaryName LIKE $term)
+          LEFT JOIN Document d ON d.Id = m.DocumentId AND (d.Name LIKE $term OR d.AuxiliaryName LIKE $term)
+          WHERE g.Id IS NOT NULL OR p.Id IS NOT NULL OR d.Id IS NOT NULL
+          ";
+          $tables = '`Groups` g, Product p, Document d, Menu m';
+          }
         if ($SQL_FindMenu) {
-            $fmrs = $db->sql_query($SQL_FindMenu, 'Menu');
+            $sql = "SELECT mm.Id mId, mm.ParentId, s.Name StructureElement, 
+                    COALESCE(gg.Name, pp.Name, dd.Name) AS Name, COALESCE(gg.AuxiliaryName, pp.AuxiliaryName, dd.AuxiliaryName) AS AuxiliaryName , 
+                    CASE WHEN gg.Id IS NOT NULL THEN 'G' WHEN pp.Id IS NOT NULL THEN 'P' ELSE 'D' END AS Type 
+                    FROM Menu mm
+                    INNER JOIN StructureElement s ON mm.StructureElementId = s.Id 
+                    INNER JOIN ($SQL_FindMenu) AS sub ON sub.Id = mm.Id
+                    LEFT JOIN `Groups` gg ON gg.Id = mm.GroupId
+                    LEFT JOIN Product pp ON pp.Id = mm.ProductId
+                    LEFT JOIN Document dd ON dd.Id = mm.DocumentId
+                    ORDER BY s.Name, mm.Id
+                    ";
+            $tables .= ', Menu mm, `Groups` gg, Product pp, Document dd';
+
+            $fmrs = $db->sql_query($sql, $tables);
             while ($row = $db->sql_fetch_object($fmrs)) {
                 $fmrow[] = $row;
             }
@@ -361,7 +419,7 @@ function findMenuId(&$menuId, $groupId, $productId, $documentId, $contextId) {
                     global $dialog;
                     $dialog .= "<b>Results: </b><br/>";
                     foreach ($fmrow as $row) {
-                        $dialog .= "<a href=\"javascript:toMenu(" . $row->mId . ")\">MenuId: " . $row->mId . "</a></br>";
+                        $dialog .= "<a href=\"javascript:toMenu({$row->mId})\">MenuId: {$row->mId} -> {$row->StructureElement}: {$row->Name} {$row->AuxiliaryName}</a></br>";
                     }
                 }
             } else {
@@ -472,10 +530,11 @@ function toParent($menuId) {
             #dialog{
                 position: absolute;
                 z-index: 100;
-                top: 50%;
-                left: 50%;
-                width: 150px;
-                height: 100px;
+                top: 20%;
+                left: 15%;
+                width: 70%;
+                height: 40%;
+                overflow: scroll;
                 background: #eee;
                 margin-left: -75px;
                 margin-top: -50px;
@@ -490,15 +549,14 @@ function toParent($menuId) {
                 right: 3px;
             }
         </style>
-        <script language="JavaScript">
-            <!--
+        <script>
             function dosubmit( )
             {
                 document.f.ProductId.value = -1;
                 document.f.GroupId.value = -1;
                 document.f.DocumentId.value = -1;
                 document.f.ContextId.value = -1;
-                document.f.AsimOID.value = -1;
+                document.f.search.value = "";
                 document.f.submit();
             }
             function toMenu(id)
@@ -508,7 +566,7 @@ function toParent($menuId) {
                 document.f.GroupId.value = -1;
                 document.f.DocumentId.value = -1;
                 document.f.ContextId.value = -1;
-                document.f.AsimOID.value = -1;
+                document.f.search.value = "";
                 document.f.submit();
             }
             function byGroup( )
@@ -517,8 +575,12 @@ function toParent($menuId) {
                 document.f.ProductId.value = -1;
                 document.f.DocumentId.value = -1;
                 document.f.ContextId.value = -1;
-                document.f.AsimOID.value = -1;
+                document.f.search.value = "";
                 document.f.submit();
+            }
+            function byGroupId(id) {
+                document.f.GroupId.value = id;
+                byGroup();
             }
             function byProduct( )
             {
@@ -526,8 +588,16 @@ function toParent($menuId) {
                 document.f.GroupId.value = -1;
                 document.f.DocumentId.value = -1;
                 document.f.ContextId.value = -1;
-                document.f.AsimOID.value = -1;
+                document.f.search.value = "";
                 document.f.submit();
+            }
+            function byProductId(id) {
+                document.f.ProductId.value = id;
+                byProduct();
+            }
+            function byDocumentId(id) {
+                document.f.DocumentId.value = id;
+                byDocument();
             }
             function byDocument( )
             {
@@ -535,7 +605,7 @@ function toParent($menuId) {
                 document.f.GroupId.value = -1;
                 document.f.ProductId.value = -1;
                 document.f.ContextId.value = -1;
-                document.f.AsimOID.value = -1;
+                document.f.search.value = "";
                 document.f.submit();
             }
             function byContext( )
@@ -544,10 +614,10 @@ function toParent($menuId) {
                 document.f.GroupId.value = -1;
                 document.f.ProductId.value = -1;
                 document.f.DocumentId.value = -1;
-                document.f.AsimOID.value = -1;
+                document.f.search.value = "";
                 document.f.submit();
             }
-            function byAsimOID( )
+            function bySearch( )
             {
                 document.f.MenuId.value = -1;
                 document.f.GroupId.value = -1;
@@ -571,7 +641,6 @@ function toParent($menuId) {
                 var dialog = document.getElementById("dialog");
                 dialog.style.display = 'none';
             }
-            //-->
         </script>
     </head>
 
@@ -603,14 +672,16 @@ function toParent($menuId) {
                 <input type="text" name="ContextId" value="<?php echo $contextId ?>">
                 <input type="button" onClick="byContext();" value="By Context" style="width:100px;">
 
-                <input type="hidden" name="AsimOID" value="<?php echo $asimId ?>">
-                <!-- <input type="button" onClick="byAsimOID();" value="By Asim OID">-->
+                <input type="text" name="search" value="<?php echo $searchTerm ?>">
+                <input type="button" onClick="bySearch();" value="Search" style="width:100px;">
+
             </form>
             <div id="wrapperMenu">
                 <a href="#Groups">To Groups</a> | 
                 <a href="#Product">To Products</a> | 
                 <a href="#Document">To Documents</a> | 
-                <a href="#smz">To SMZs</a>
+                <a href="#smz">To SMZs</a> |
+                <a href="#relations">To Relations</a>
             </div>
         </div>
         <div id="wrapper">
@@ -629,6 +700,8 @@ function toParent($menuId) {
             printChildren($menuId, 'Document', 'Document', $db, false, true);
 
             printSMZs($menuId, $db, $useStage);
+
+            printRelations($menuId, $db, $useStage);
 
             $db->sql_close();
 
