@@ -25,7 +25,7 @@ define('MS3C_CMS_TYPE', 'None');	// Alternatives: None, Typo3, Magento, Woo
 
 /// For Typo3:
 define('MS3C_TYPO3_RELEASE', '11'); // Alternatives: 9-11
-define('MS3C_TYPO3_TYPE', 'FX'); // Alternatives: FX, PI
+define('MS3C_TYPO3_TYPE', 'FX'); // Alternatives: FX
 define('MS3C_TYPO3_CACHED', 1); // boolean
 
 /// For Magento:
@@ -38,19 +38,12 @@ define('MS3C_WOO_ONLY', false);	// Can be omitted
 define('MS3C_NO_SMZ', false); // Can be omitted if SMZ is used
 
 // RealURL/Pivot:
-define('MS3C_REALURL_SHOP_CHECK_TYPE', 'None');	// Alternatives: None, SysLanguageUid, ShopId, ContextId
 define('RealURLMap_TABLE', 'RealURLMap');	// Can be omitted if not using Pivot mapping table
 // Shop:
 define('MS3C_SHOP_SYSTEM', 'None');	// Alternatives: None, tt_products (requires Typo3)
-define('MS3C_SHOP_USE_ORDER_BILLING_ADDRESS', false);
-//define('MS3C_OVERWRITE_BASKET_MAIL_RECV', '');	// For testing, omit in production
-//define('MS3C_OVERWRITE_MAIL_RECV', '');	// For testing, omit in production
-// OCI:
-define('MS3C_ENABLE_OCI', false);	// Can be omitted if OCI is not used (requires tt_products)
 
 // Search:
-define('MS3C_SEARCH_BACKEND', 'None');	// Alternatives: None, ElasticSearch, MySQL
-define('MS3C_QUICK_COMPLETE', false);
+define('MS3C_SEARCH_BACKEND', 'None');	// Alternatives: None, MySQL
 
 // Customization:
 define('MS3C_DEFAULT_FROM_EMAIL', 'noreply@goodson.at');
@@ -63,8 +56,3 @@ define('MS3C_ALLOWCREATE_SQL', 0);
 // Email list for Notifications read out of the dataTransfer Log file 
 define('MS3C_LOG_NOTIFICATION_ADDRESSES', '');
 define('MS3C_LOG_EMAIL_SENDER', 'importMaster@goodson.at');
-
-// For Scheduler tasks
-define('MS3C_TASK_MAIL_RECEIVER','');
-define('MS3C_TASK_NOTIFY_ON_SUCCESS', false);
-define('MS3C_PHP_BINARY', 'php');
